@@ -1,125 +1,147 @@
-import json
-
-File_Name = "students.json"
-
-#Load students from file
-def load_students():
-    try:
-        with open(File_Name, "r") as file:
-            students = json.load(file)
-            return students
-    except:
-        return []
-    
-#Save students to file
-def save_students(students):
-    with open(File_Name, "w") as file:
-        json.dump(students, file, indent=4)
+from database import connect, create_table
+import sqlite3
 
 # Add student
 def add_student():
-    students = load_students()
 
-    student_id = input("Enter student ID: ").strip()
+    conn = connect()
+    cursor = conn.cursor()
 
-    # Prevent duplicate
-    for student in students:
-        if student["id"] == student_id:
-            print("Student ID already exists.")
-            return
-        
+    student_id = input("Enter student ID: ")
     name = input("Enter name: ")
     age = input("Enter age: ")
     course = input("Enter course: ")
 
-    student = {
-        "id": student_id,
-        "name": name,
-        "age": age,
-        "course": course
-    }
+    try:
 
-    students.append(student)
+        cursor.execute(
+            "INSERT INTO students VALUES (?, ?, ?, ?)",
+            (student_id, name, age, course)
+        )
 
-    save_students(students)
+        conn.commit()
 
-    print("Student added successfully!")
+        print("Student added successfully!")
+
+    except sqlite3.IntegrityError:
+
+        print("Error: Student ID already exists.")
+
+    conn.close()
+
 
 # View students
 def view_students():
-    students = load_students()
+    
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM students")
+
+    students = cursor.fetchall()
 
     if not students:
         print("No students found.")
+        conn.close()
         return
     
     print("\n--- Student List ---")
 
     for student in students:
-        print(f"ID: {student['id']} | Name: {student['name']} | Age: {student['age']} | Course: {student['course']}")
+        print(f"ID: {student[0]} | Name: {student[1]} | Age: {student[2]} | Course: {student[3]}")
+        conn.close()
 
 #Search student
 def search_student():
-    students = load_students()
 
-    search_id = input("Enter student ID to search: ")
+    conn = connect()
+    cursor = conn.cursor()
 
-    for student in students:
-        if student["id"] == search_id:
-            print("Student found: ")
-            print(student)
-            return
-    
-    print("Student not found.")
+    student_id = input("Enter student ID: ")
+
+    cursor.execute(
+        "SELECT * FROM students WHERE id = ?",
+        (student_id,)
+    )
+
+    student = cursor.fetchone()
+
+    if student:
+        print("\nStudent Found: ")
+        print(f"ID: {student[0]}")
+        print(f"Name: {student[1]}")
+        print(f"Age: {student[2]}")
+        print(f"Course: {student[3]}")
+    else:
+        print("Student not found.")
+
+        conn.close()
 
 # Delete student
 def delete_student():
-    students = load_students()
+    
+    conn = connect()
+    cursor = conn.cursor()
 
-    delete_id = input("Enter student ID to delete: ")
+    student_id = input("Enter student ID to delete: ")
 
-    new_student = []
+    cursor.execute(
+        "DELETE FROM students WHERE id = ?",
+        (student_id,)
+    )
 
-    for student in students:
-        if student["id"] != delete_id: 
-            new_student.append(student)
-
-    save_students(new_student) 
+    conn.commit()
 
     print("Student deleted if existed.")
 
+    conn.close()
+
 # Update Student info
 def update_student():
-    students = load_students()
+    
+    conn = connect()
+    cursor = conn.cursor()
 
-    update_id = input("Enter student ID to update: ")
+    student_id = input("Enter student ID to update: ")
 
-    for student in students:
-        if student["id"] == update_id:
-            print("Leave blank to keep current value")
+    cursor.execute(
+        "SELECT * FROM students WHERE id = ?",
+        (student_id,)
+    )
 
-            new_name = input(f"Enter new name ({student['name']}): ")
-            new_age = input(f"Enter new age ({student['age']}): ")
-            new_course = input(f"Enter new course ({student['course']}): ")
+    student = cursor.fetchone()
 
-            if new_name:
-                student["name"] = new_name
+    if not student:
+        print("Student not found.")
+        conn.close()
+        return
 
-            if new_age:
-                student["age"] = new_age
+    print("Leave blank to keep current value")
 
-            if new_course:
-                student["course"] = new_course
+    name = input(f"Enter new name ({student[1]}): ")
+    age = input(f"Enter new age ({student[2]}): ")
+    course = input(f"Enter new course ({student[3]}): ")
 
-            save_students(students)
+    name = name if name else student[1]
+    age = age if age else student[2]
+    course = course if course else student[3]
 
-            print("Student updated successfully!")
-            return
+    cursor.execute(
+        "UPDATE students SET name=?, age=?, course=? WHERE id=?",
+        (name, age, course, student_id)
+    )
 
-    print("Student not found.")    
+    conn.commit()
+
+    print("Student updated successfully!")
+    
+    conn.close()
 
 # Menu
 def menu():
+
+    create_table()
+
     while True:
         print("\nStudent Management System")
         print("1. Add Student")
