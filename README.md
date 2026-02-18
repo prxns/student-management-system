@@ -1,17 +1,18 @@
 # Student Management System
 
-A simple Python-based system to manage student records.
+A Python-based system to manage student records.
 
 Features:
 - Add student
 - View student
 - Search student
 - Delete student
-- File storage using JSON
+- Update Student
+- File storage using SQLite
 
 Technologies:
 - Python
-- JSON
+- SQLite
 - Git
 
 Author: Pranshu
