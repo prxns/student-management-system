@@ -20,7 +20,14 @@ def save_students(students):
 def add_student():
     students = load_students()
 
-    student_id = input("Enter student ID: ")
+    student_id = input("Enter student ID: ").strip()
+
+    # Prevent duplicate
+    for student in students:
+        if student["id"] == student_id:
+            print("Student ID already exists.")
+            return
+        
     name = input("Enter name: ")
     age = input("Enter age: ")
     course = input("Enter course: ")
@@ -46,12 +53,10 @@ def view_students():
         print("No students found.")
         return
     
+    print("\n--- Student List ---")
+
     for student in students:
-        print("---------------")
-        print("ID: ", student["id"])
-        print("Name: ", student["name"])
-        print("Age: ", student["age"])
-        print("Course: ", student["course"])
+        print(f"ID: {student['id']} | Name: {student['name']} | Age: {student['age']} | Course: {student['course']}")
 
 #Search student
 def search_student():
@@ -83,6 +88,36 @@ def delete_student():
 
     print("Student deleted if existed.")
 
+# Update Student info
+def update_student():
+    students = load_students()
+
+    update_id = input("Enter student ID to update: ")
+
+    for student in students:
+        if student["id"] == update_id:
+            print("Leave blank to keep current value")
+
+            new_name = input(f"Enter new name ({student['name']}): ")
+            new_age = input(f"Enter new age ({student['age']}): ")
+            new_course = input(f"Enter new course ({student['course']}): ")
+
+            if new_name:
+                student["name"] = new_name
+
+            if new_age:
+                student["age"] = new_age
+
+            if new_course:
+                student["course"] = new_course
+
+            save_students(students)
+
+            print("Student updated successfully!")
+            return
+
+    print("Student not found.")    
+
 # Menu
 def menu():
     while True:
@@ -91,7 +126,8 @@ def menu():
         print("2. View Student")
         print("3. Search Student")
         print("4. Delete Student")
-        print("5. Exit")
+        print("5. Update Student")
+        print("6. Exit")
 
         choice = input("Enter choice: ")
 
@@ -106,8 +142,11 @@ def menu():
 
         elif choice == "4":
             delete_student()
-
+        
         elif choice == "5":
+            update_student()
+
+        elif choice == "6":
             break
 
         else:

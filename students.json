@@ -1,14 +1,20 @@
 [
     {
         "id": "23",
-        "name": "rwt",
-        "age": "21",
-        "course": "btech"
+        "name": "Pranshu",
+        "age": "22",
+        "course": "B.Tech CSE"
     },
     {
-        "id": "32",
-        "name": "ritz",
-        "age": "23",
-        "course": "ui"
+        "id": "8",
+        "name": "Ritz",
+        "age": "25",
+        "course": "Ui/Ux"
+    },
+    {
+        "id": "12",
+        "name": "Destiny",
+        "age": "21",
+        "course": "MBA"
     }
 ]
