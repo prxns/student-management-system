@@ -1,4 +1,4 @@
-# Student Management System
+# Student Record Management System
 
 A desktop based Student Management System built using Python, Tkinter, and SQLite.
 This application allows users to manage records through a professional graphical user interface.
